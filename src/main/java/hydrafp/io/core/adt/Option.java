@@ -62,6 +62,10 @@ public abstract class Option<T> {
         return either.fold(l -> Option.none(), Option::some);
     }
 
+    public Try<T> toTry(Supplier<? extends Throwable> ifNone) {
+        return isDefined() ? Try.success(get()) : Try.failure(ifNone.get());
+    }
+
     public static final class Some<T> extends Option<T> {
         private final T value;
 
