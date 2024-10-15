@@ -65,6 +65,8 @@ public abstract class Try<T> {
 
     public abstract <L> Either<L, T> toEither(Function<Throwable, L> leftMapper);
 
+    public abstract <X extends Throwable> T getOrElseThrow(Function<? super Throwable, X> exceptionFunction) throws X;
+
     public static <T> Try<T> fromEither(Either<Throwable, T> either) {
         Objects.requireNonNull(either, "either must not be null");
         return either.fold(Try::failure, Try::success);
@@ -81,6 +83,7 @@ public abstract class Try<T> {
         Objects.requireNonNull(mapper, "mapper must not be null");
         return flatMap(value -> fromOption(mapper.apply(value), () -> new NoSuchElementException("Option is None")));
     }
+
 
 
     private static final class Success<T> extends Try<T> {
@@ -203,6 +206,10 @@ public abstract class Try<T> {
             return Either.right(value);
         }
 
+        @Override
+        public <X extends Throwable> T getOrElseThrow(Function<? super Throwable, X> exceptionFunction) {
+            return value;
+        }
 
         @Override
         public boolean equals(Object obj) {
@@ -334,6 +341,12 @@ public abstract class Try<T> {
         public <L> Either<L, T> toEither(Function<Throwable, L> leftMapper) {
             Objects.requireNonNull(leftMapper, "leftMapper must not be null");
             return Either.left(leftMapper.apply(exception));
+        }
+
+
+        @Override
+        public <X extends Throwable> T getOrElseThrow(Function<? super Throwable, X> exceptionFunction) throws X {
+            throw exceptionFunction.apply(exception);
         }
 
         @Override
