@@ -90,6 +90,17 @@ public abstract class Either<L, R> {
         );
     }
 
+    public static <L, R> Either<L, R> catching(Supplier<R> supplier, Function<Throwable, L> errorMapper) {
+        Objects.requireNonNull(supplier, "supplier must not be null");
+        Objects.requireNonNull(errorMapper, "errorMapper must not be null");
+        try {
+            return Either.right(supplier.get());
+        } catch (Throwable t) {
+            return Either.left(errorMapper.apply(t));
+        }
+    }
+
+
 
     private static final class Left<L, R> extends Either<L, R> {
         private final L value;

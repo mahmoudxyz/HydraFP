@@ -32,14 +32,14 @@ class EitherTest {
     @Test
     void fold_appliesLeftFunctionForLeft() {
         Either<String, Integer> left = Either.left("Error");
-        String result = left.fold(l -> l + "!", r -> r.toString());
+        String result = left.fold(l -> l + "!", Object::toString);
         assertEquals("Error!", result);
     }
 
     @Test
     void fold_appliesRightFunctionForRight() {
         Either<String, Integer> right = Either.right(42);
-        String result = right.fold(l -> l, r -> r.toString());
+        String result = right.fold(l -> l, Object::toString);
         assertEquals("42", result);
     }
 
@@ -320,7 +320,7 @@ class EitherTest {
         Either<String, Integer> left = Either.left("Error");
         Try<Integer> result = left.toTry();
         assertTrue(result.isFailure());
-        assertTrue(result.getFailure() instanceof NoSuchElementException);
+        assertInstanceOf(NoSuchElementException.class, result.getFailure());
     }
 
     @Test
