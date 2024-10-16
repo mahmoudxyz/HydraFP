@@ -1,3 +1,11 @@
+[![Release](https://img.shields.io/github/v/release/mahmoudxyz/HydraFP?style=flat-square)](https://github.com/mahmoudxyz/HydraFP/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![JitPack](https://img.shields.io/jitpack/v/github/mahmoudxyz/HydraFP?style=flat-square)](https://jitpack.io/#mahmoudxyz/HydraFP)
+[![Java Version](https://img.shields.io/badge/Java-17%2B-blue?style=flat-square)](https://www.java.com)
+[![Stars](https://img.shields.io/github/stars/mahmoudxyz/HydraFP?style=flat-square)](https://github.com/mahmoudxyz/HydraFP/stargazers)
+[![Forks](https://img.shields.io/github/forks/mahmoudxyz/HydraFP?style=flat-square)](https://github.com/mahmoudxyz/HydraFP/network/members)
+[![Issues](https://img.shields.io/github/issues/mahmoudxyz/HydraFP?style=flat-square)](https://github.com/mahmoudxyz/HydraFP/issues)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 # HydraFP: Functional Programming Simplified for Java
 
 HydraFP brings the power of functional programming to Java, making it easier to write clean, composable, and side-effect free code.
