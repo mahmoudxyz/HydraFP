@@ -18,40 +18,29 @@ HydraFP brings the power of functional programming to Java, making it easier to 
 - 🔍 **Pattern Matching**: Expressive and type-safe pattern matching for Java
 
 
-## STOP HERE
-This still under creating and only a placeholder, please don't expect anything for now
-
 ## Quick Start
 
-Add HydraFP to your project:
+**Step 1.** Add the JitPack repository to your build file
+
+```xml
+<repositories>
+	<repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+	</repository>
+</repositories>
+```
+
+**Step 2.** Add HydraFP to your project:
 
 ```xml
 <dependency>
-    <groupId>io.hydrafp</groupId>
-    <artifactId>hydrafp-core</artifactId>
-    <version>1.0.0</version>
+    <groupId>com.github.mahmoudxyz</groupId>
+    <artifactId>HydraFP</artifactId>
+    <version>Tag</version>
 </dependency>
+
 ```
-
-Simple example using the Effect system:
-
-```java
-import io.hydrafp.core.effect.*;
-
-Effect<String> effect = Effects.defer(() -> "Hello, HydraFP!");
-String result = effect.unsafeRunSync(new SimpleRuntime());
-System.out.println(result); // Outputs: Hello, HydraFP!
-```
-
-## Learn More
-
-- [Documentation](https://hydrafp.io/docs)
-- [API Reference](https://hydrafp.io/api)
-- [Tutorials](https://hydrafp.io/tutorials)
-
-## Contributing
-
-We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ## License
 
