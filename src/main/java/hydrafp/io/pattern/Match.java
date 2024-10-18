@@ -2,16 +2,17 @@ package hydrafp.io.pattern;
 
 import hydrafp.io.core.adt.Either;
 import hydrafp.io.core.adt.Option;
+import hydrafp.io.core.functions.Function1;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
+
 
 public class Match<T> {
     private final T value;
     private final List<Case<T, ?>> cases = new ArrayList<>();
-    private Function<T, ?> otherwise;
+    private Function1<T, ?> otherwise;
 
     private Match(T value) {
         this.value = value;
@@ -45,7 +46,7 @@ public class Match<T> {
         return otherwise(ignored -> defaultValue);
     }
 
-    public <R> Option<R> otherwise(Function<T, R> mapper) {
+    public <R> Option<R> otherwise(Function1<T, R> mapper) {
         this.otherwise = mapper;
         return result();
     }
@@ -63,15 +64,15 @@ public class Match<T> {
         return Option.of(null);
     }
 
-    <R> void addCase(Predicate<T> predicate, Function<T, R> mapper) {
+    <R> void addCase(Predicate<T> predicate, Function1<T, R> mapper) {
         cases.add(new Case<>(predicate, mapper));
     }
 
     private static class Case<T, R> {
         final Predicate<T> predicate;
-        final Function<T, R> mapper;
+        final Function1<T, R> mapper;
 
-        Case(Predicate<T> predicate, Function<T, R> mapper) {
+        Case(Predicate<T> predicate, Function1<T, R> mapper) {
             this.predicate = predicate;
             this.mapper = mapper;
         }
@@ -90,7 +91,7 @@ public class Match<T> {
             return then(ignored -> result);
         }
 
-        public Match<T> then(Function<T, R> mapper) {
+        public Match<T> then(Function1<T, R> mapper) {
             match.addCase(predicate, mapper);
             return match;
         }
@@ -105,7 +106,7 @@ public class Match<T> {
             this.type = type;
         }
 
-        public Match<T> then(Function<R, ?> mapper) {
+        public Match<T> then(Function1<R, ?> mapper) {
             match.addCase(type::isInstance, v -> mapper.apply(type.cast(v)));
             return match;
         }
@@ -120,7 +121,7 @@ public class Match<T> {
             this.leftType = leftType;
         }
 
-        public <U> Match<T> then(Function<? super L, ? extends U> mapper) {
+        public <U> Match<T> then(Function1<? super L, ? extends U> mapper) {
             match.addCase(
                     v -> v instanceof Either && ((Either<?, ?>) v).isLeft() && leftType.isInstance(((Either<?, ?>) v).fold(l -> l, r -> r)),
                     v -> {
@@ -141,7 +142,7 @@ public class Match<T> {
             this.rightType = rightType;
         }
 
-        public <U> Match<T> then(Function<? super R, ? extends U> mapper) {
+        public <U> Match<T> then(Function1<? super R, ? extends U> mapper) {
             match.addCase(
                     v -> v instanceof Either && !((Either<?, ?>) v).isLeft() && rightType.isInstance(((Either<?, ?>) v).fold(l -> l, r -> r)),
                     v -> {
