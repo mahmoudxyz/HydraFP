@@ -1,12 +1,14 @@
 package hydrafp.io.core.adt;
 
+import hydrafp.io.core.functions.Function1;
+
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
 
 public abstract class Either<L, R> {
     private Either() {
@@ -20,19 +22,19 @@ public abstract class Either<L, R> {
         return new Right<>(Objects.requireNonNull(value, "Right value must not be null"));
     }
 
-    public abstract <T> T fold(Function<? super L, ? extends T> leftMapper, Function<? super R, ? extends T> rightMapper);
+    public abstract <T> T fold(Function1<? super L, ? extends T> leftMapper, Function1<? super R, ? extends T> rightMapper);
 
-    public abstract <T> Either<L, T> map(Function<? super R, ? extends T> mapper);
+    public abstract <T> Either<L, T> map(Function1<? super R, ? extends T> mapper);
 
-    public abstract <T> Either<L, T> flatMap(Function<? super R, ? extends Either<L, T>> mapper);
+    public abstract <T> Either<L, T> flatMap(Function1<? super R, ? extends Either<L, T>> mapper);
 
-    public abstract <T> Either<T, R> mapLeft(Function<? super L, ? extends T> mapper);
+    public abstract <T> Either<T, R> mapLeft(Function1<? super L, ? extends T> mapper);
 
-    public abstract <T> Either<T, R> flatMapLeft(Function<? super L, ? extends Either<T, R>> mapper);
+    public abstract <T> Either<T, R> flatMapLeft(Function1<? super L, ? extends Either<T, R>> mapper);
 
     public abstract Either<L, R> filter(Predicate<? super R> predicate, Supplier<? extends L> leftSupplier);
 
-    public abstract Either<L, R> filterOrElse(Predicate<? super R> predicate, Function<? super R, ? extends L> leftMapper);
+    public abstract Either<L, R> filterOrElse(Predicate<? super R> predicate, Function1<? super R, ? extends L> leftMapper);
 
     public abstract boolean isLeft();
 
@@ -49,19 +51,19 @@ public abstract class Either<L, R> {
     public abstract Either<R, L> swap();
 
     public R getRightOrElse(R defaultValue) {
-        return fold(l -> defaultValue, Function.identity());
+        return fold(l -> defaultValue, Function1.identity());
     }
 
     public L getLeftOrElse(L defaultValue) {
-        return fold(Function.identity(), r -> defaultValue);
+        return fold(Function1.identity(), r -> defaultValue);
     }
 
     public R getRightOrElse(Supplier<? extends R> supplier) {
-        return fold(l -> supplier.get(), Function.identity());
+        return fold(l -> supplier.get(), Function1.identity());
     }
 
     public L getLeftOrElse(Supplier<? extends L> supplier) {
-        return fold(Function.identity(), r -> supplier.get());
+        return fold(Function1.identity(), r -> supplier.get());
     }
 
     public abstract Either<L, R> orElse(Supplier<? extends Either<L, R>> supplier);
@@ -81,7 +83,7 @@ public abstract class Either<L, R> {
                 .getOrElse(() -> Either.left(leftSupplier.get()));
     }
 
-    public static <L, R> Either<L, R> fromTry(Try<R> t, Function<Throwable, L> leftMapper) {
+    public static <L, R> Either<L, R> fromTry(Try<R> t, Function1<Throwable, L> leftMapper) {
         Objects.requireNonNull(t, "try must not be null");
         Objects.requireNonNull(leftMapper, "leftMapper must not be null");
         return t.fold(
@@ -90,7 +92,8 @@ public abstract class Either<L, R> {
         );
     }
 
-    public static <L, R> Either<L, R> catching(Supplier<R> supplier, Function<Throwable, L> errorMapper) {
+
+    public static <L, R> Either<L, R> catching(Supplier<R> supplier, Function1<Throwable, L> errorMapper) {
         Objects.requireNonNull(supplier, "supplier must not be null");
         Objects.requireNonNull(errorMapper, "errorMapper must not be null");
         try {
@@ -101,7 +104,6 @@ public abstract class Either<L, R> {
     }
 
 
-
     private static final class Left<L, R> extends Either<L, R> {
         private final L value;
 
@@ -110,27 +112,27 @@ public abstract class Either<L, R> {
         }
 
         @Override
-        public <T> T fold(Function<? super L, ? extends T> leftMapper, Function<? super R, ? extends T> rightMapper) {
+        public <T> T fold(Function1<? super L, ? extends T> leftMapper, Function1<? super R, ? extends T> rightMapper) {
             return leftMapper.apply(value);
         }
 
         @Override
-        public <T> Either<L, T> map(Function<? super R, ? extends T> mapper) {
+        public <T> Either<L, T> map(Function1<? super R, ? extends T> mapper) {
             return (Either<L, T>) this;
         }
 
         @Override
-        public <T> Either<L, T> flatMap(Function<? super R, ? extends Either<L, T>> mapper) {
+        public <T> Either<L, T> flatMap(Function1<? super R, ? extends Either<L, T>> mapper) {
             return (Either<L, T>) this;
         }
 
         @Override
-        public <T> Either<T, R> mapLeft(Function<? super L, ? extends T> mapper) {
+        public <T> Either<T, R> mapLeft(Function1<? super L, ? extends T> mapper) {
             return new Left<>(mapper.apply(value));
         }
 
         @Override
-        public <T> Either<T, R> flatMapLeft(Function<? super L, ? extends Either<T, R>> mapper) {
+        public <T> Either<T, R> flatMapLeft(Function1<? super L, ? extends Either<T, R>> mapper) {
             return mapper.apply(value);
         }
 
@@ -140,7 +142,7 @@ public abstract class Either<L, R> {
         }
 
         @Override
-        public Either<L, R> filterOrElse(Predicate<? super R> predicate, Function<? super R, ? extends L> leftMapper) {
+        public Either<L, R> filterOrElse(Predicate<? super R> predicate, Function1<? super R, ? extends L> leftMapper) {
             return this;
         }
 
@@ -234,27 +236,27 @@ public abstract class Either<L, R> {
         }
 
         @Override
-        public <T> T fold(Function<? super L, ? extends T> leftMapper, Function<? super R, ? extends T> rightMapper) {
+        public <T> T fold(Function1<? super L, ? extends T> leftMapper, Function1<? super R, ? extends T> rightMapper) {
             return rightMapper.apply(value);
         }
 
         @Override
-        public <T> Either<L, T> map(Function<? super R, ? extends T> mapper) {
+        public <T> Either<L, T> map(Function1<? super R, ? extends T> mapper) {
             return new Right<>(mapper.apply(value));
         }
 
         @Override
-        public <T> Either<L, T> flatMap(Function<? super R, ? extends Either<L, T>> mapper) {
+        public <T> Either<L, T> flatMap(Function1<? super R, ? extends Either<L, T>> mapper) {
             return mapper.apply(value);
         }
 
         @Override
-        public <T> Either<T, R> mapLeft(Function<? super L, ? extends T> mapper) {
+        public <T> Either<T, R> mapLeft(Function1<? super L, ? extends T> mapper) {
             return (Either<T, R>) this;
         }
 
         @Override
-        public <T> Either<T, R> flatMapLeft(Function<? super L, ? extends Either<T, R>> mapper) {
+        public <T> Either<T, R> flatMapLeft(Function1<? super L, ? extends Either<T, R>> mapper) {
             return (Either<T, R>) this;
         }
 
@@ -264,7 +266,7 @@ public abstract class Either<L, R> {
         }
 
         @Override
-        public Either<L, R> filterOrElse(Predicate<? super R> predicate, Function<? super R, ? extends L> leftMapper) {
+        public Either<L, R> filterOrElse(Predicate<? super R> predicate, Function1<? super R, ? extends L> leftMapper) {
             return predicate.test(value) ? this : new Left<>(leftMapper.apply(value));
         }
 

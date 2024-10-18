@@ -1,10 +1,11 @@
 package hydrafp.io.core.adt;
 
+import hydrafp.io.core.functions.Function1;
+
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -27,9 +28,9 @@ public abstract class Option<T> {
         return (Option<T>) None.INSTANCE;
     }
 
-    public abstract <U> Option<U> flatMap(Function<? super T, Option<U>> mapper);
+    public abstract <U> Option<U> flatMap(Function1<? super T, Option<U>> mapper);
 
-    public abstract <U> Option<U> map(Function<? super T, ? extends U> mapper);
+    public abstract <U> Option<U> map(Function1<? super T, ? extends U> mapper);
 
     public abstract T getOrElse(T other);
 
@@ -44,6 +45,8 @@ public abstract class Option<T> {
     public abstract <L> Either<L, T> toEither(Supplier<L> leftSupplier);
 
     public abstract Option<T> filter(Predicate<? super T> predicate);
+
+    public abstract <U> U match(Supplier<? extends U> noneCase, Function1<? super T, ? extends U> someCase);
 
     public abstract void forEach(Consumer<? super T> action);
 
@@ -95,13 +98,13 @@ public abstract class Option<T> {
 
 
         @Override
-        public <U> Option<U> map(Function<? super T, ? extends U> mapper) {
+        public <U> Option<U> map(Function1<? super T, ? extends U> mapper) {
             Objects.requireNonNull(mapper, "mapper must not be null");
             return Option.of(mapper.apply(value));
         }
 
         @Override
-        public <U> Option<U> flatMap(Function<? super T, Option<U>> mapper) {
+        public <U> Option<U> flatMap(Function1<? super T, Option<U>> mapper) {
             Objects.requireNonNull(mapper, "mapper must not be null");
             return mapper.apply(value);
         }
@@ -111,6 +114,13 @@ public abstract class Option<T> {
             Objects.requireNonNull(predicate, "predicate must not be null");
             return predicate.test(value) ? this : none();
         }
+
+        @Override
+        public <U> U match(Supplier<? extends U> noneCase, Function1<? super T, ? extends U> someCase) {
+            Objects.requireNonNull(someCase, "someCase must not be null");
+            return someCase.apply(value);
+        }
+
 
         @Override
         public void forEach(Consumer<? super T> action) {
@@ -191,13 +201,13 @@ public abstract class Option<T> {
         }
 
         @Override
-        public <U> Option<U> map(Function<? super T, ? extends U> mapper) {
+        public <U> Option<U> map(Function1<? super T, ? extends U> mapper) {
             Objects.requireNonNull(mapper, "mapper must not be null");
             return none();
         }
 
         @Override
-        public <U> Option<U> flatMap(Function<? super T, Option<U>> mapper) {
+        public <U> Option<U> flatMap(Function1<? super T, Option<U>> mapper) {
             Objects.requireNonNull(mapper, "mapper must not be null");
             return none();
         }
@@ -206,6 +216,12 @@ public abstract class Option<T> {
         public Option<T> filter(Predicate<? super T> predicate) {
             Objects.requireNonNull(predicate, "predicate must not be null");
             return this;
+        }
+
+        @Override
+        public <U> U match(Supplier<? extends U> noneCase, Function1<? super T, ? extends U> someCase) {
+            Objects.requireNonNull(noneCase, "noneCase must not be null");
+            return noneCase.get();
         }
 
         @Override
