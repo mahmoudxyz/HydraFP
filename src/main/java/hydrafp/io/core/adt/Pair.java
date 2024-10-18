@@ -70,14 +70,14 @@ public final class Pair<A, B> {
 
     public static <A, B, C> Function1<Pair<A, B>, Either<String, C>> uncurry(Function2<A, B, C> f) {
         if (f == null) {
-            return pair -> Either.left("Function1 cannot be null");
+            return pair -> Either.left("Function cannot be null");
         }
         return pair -> Either.right(f.apply(pair.first, pair.second));
     }
 
     public static <A, B, C> Either<String, Function2<A, B, C>> curry(Function1<Pair<A, B>, C> f) {
         if (f == null) {
-            return Either.left("Function1 cannot be null");
+            return Either.left("Function cannot be null");
         }
         return Either.right((a, b) -> f.apply(new Pair<>(a, b)));
     }
