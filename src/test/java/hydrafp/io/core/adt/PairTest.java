@@ -1,9 +1,8 @@
 package hydrafp.io.core.adt;
 
+import hydrafp.io.core.functions.Function1;
+import hydrafp.io.core.functions.Function2;
 import org.junit.jupiter.api.Test;
-
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -114,8 +113,8 @@ class PairTest {
 
     @Test
     void uncurry_convertsToSingleArgumentFunction() {
-        BiFunction<String, Integer, String> biFunction = (s, i) -> s + i;
-        Function<Pair<String, Integer>, Either<String, String>> uncurried = Pair.uncurry(biFunction);
+        Function2<String, Integer, String> biFunction = (s, i) -> s + i;
+        Function1<Pair<String, Integer>, Either<String, String>> uncurried = Pair.uncurry(biFunction);
         Either<String, String> result = uncurried.apply(Pair.of("test", 42));
         assertTrue(result.isRight());
         assertEquals("test42", result.getRight());
@@ -123,7 +122,7 @@ class PairTest {
 
     @Test
     void uncurry_handlesNullFunction() {
-        Function<Pair<String, Integer>, Either<String, Object>> uncurried = Pair.uncurry(null);
+        Function1<Pair<String, Integer>, Either<String, Object>> uncurried = Pair.uncurry(null);
         Either<String, Object> result = uncurried.apply(Pair.of("test", 42));
         assertTrue(result.isLeft());
         assertEquals("Function cannot be null", result.getLeft());
@@ -131,8 +130,8 @@ class PairTest {
 
     @Test
     void curry_convertsToBiFunction() {
-        Function<Pair<String, Integer>, String> function = pair -> pair.first() + pair.second();
-        Either<String, BiFunction<String, Integer, String>> curried = Pair.curry(function);
+        Function1<Pair<String, Integer>, String> function = pair -> pair.first() + pair.second();
+        Either<String, Function2<String, Integer, String>> curried = Pair.curry(function);
         assertTrue(curried.isRight());
         String result = curried.getRight().apply("test", 42);
         assertEquals("test42", result);
@@ -140,7 +139,7 @@ class PairTest {
 
     @Test
     void curry_handlesNullFunction() {
-        Either<String, BiFunction<String, Integer, Object>> curried = Pair.curry(null);
+        Either<String, Function2<String, Integer, Object>> curried = Pair.curry(null);
         assertTrue(curried.isLeft());
         assertEquals("Function cannot be null", curried.getLeft());
     }
